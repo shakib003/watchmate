@@ -1,3 +1,4 @@
+from http.client import HTTPResponse
 from rest_framework.response import Response
 # from rest_framework.decorators import api_view
 from rest_framework.views import APIView
@@ -6,9 +7,13 @@ from watchlist_app.api import serializers
 from watchlist_app.models import Movie
 from watchlist_app.api.serializers import MovieSerilizer
 
+class MovieHomePageAV(APIView):
+    def get(self, request):
+        return Response(["This is Movie Home Page"])
+
 
 class MovieListAV(APIView):
-    
+
     def get(self, request):
         movies = Movie.objects.all()
         serializer = MovieSerilizer(movies, many=True)
@@ -24,16 +29,16 @@ class MovieListAV(APIView):
 
 
 class MovieDetailAV(APIView):
-    
+
     def get(self, request, pk):
         try:
             movie = Movie.objects.get(pk=pk)
         except:
             return Response({"Error": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
-        
+
         serializer = MovieSerilizer(movie)
         return Response(serializer.data)
-    
+
     def put(self, request, pk):
         movie = Movie.objects.get(pk=pk)
         serializer = MovieSerilizer(movie, data=request.data)
@@ -41,17 +46,19 @@ class MovieDetailAV(APIView):
             serializer.save()
             return Response(serializer.data)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)      
-        
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request, pk):
-        
+
         movie = Movie.objects.get(pk=pk)
         movie.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)  
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-    
-    
-    
+
+
+
+
+
     # @api_view(["GET", "POST"])
     # def movie_list(request):
     #     if request.method == "GET":
