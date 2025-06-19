@@ -1,13 +1,44 @@
-from http.client import HTTPResponse
 from rest_framework.response import Response
-# from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import status
-from watchlist_app.api import serializers
-from watchlist_app.models import WatchList, StreamPlatform
-from watchlist_app.api.serializers import WatchListSerializer, StreamPlatformSerializer
+from rest_framework import generics
+from rest_framework import mixins
+
+# app import
+from watchlist_app.models import WatchList, StreamPlatform, Review
+from watchlist_app.api.serializers import (WatchListSerializer, StreamPlatformSerializer, 
+                                           ReviewSerializer)
 
 
+class ReviewList(generics.ListCreateAPIView): # get(), post()
+    queryset =  Review.objects.all()
+    serializer_class = StreamPlatformSerializer
+    
+
+
+
+# class ReviewDetail(mixins.RetrieveModelMixin, # get req
+#                   generics.GenericAPIView):
+#     queryset = Review.objects.all()
+#     serializer_class = ReviewSerializer
+
+#     def get(self, request, *args, **kwargs):
+#         return self.retrieve(request, *args, **kwargs)
+
+# class ReviewtList(mixins.ListModelMixin, # get req
+#                   mixins.CreateModelMixin, # post req
+#                   generics.GenericAPIView):
+#     queryset = Review.objects.all()
+#     serializer_class = ReviewSerializer
+
+#     def get(self, request, *args, **kwargs):
+#         return self.list(request, *args, **kwargs)
+
+#     def post(self, request, *args, **kwargs):
+#         return self.create(request, *args, **kwargs)
+
+
+#================================
 class WatchListAV(APIView):
 
     def get(self, request):
@@ -51,6 +82,8 @@ class WatchListDetailAV(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 #=============================================
 
+
+
 class StreamPlatformAV(APIView):
 
     def get(self, request):
@@ -93,7 +126,7 @@ class StreamPlatformDetailAV(APIView):
         movie.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
+## Genetic APIView
 
 
 
