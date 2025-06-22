@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import generics
 from rest_framework import mixins
+from rest_framework.exceptions import ValidationError
 
 # app import
 from watchlist_app.models import WatchList, StreamPlatform, Review
@@ -10,9 +11,38 @@ from watchlist_app.api.serializers import (WatchListSerializer, StreamPlatformSe
                                            ReviewSerializer)
 
 
-class ReviewList(generics.ListCreateAPIView): # get(), post()
+class ReviewCreate(generics.ListCreateAPIView):
+    serializer_class = ReviewSerializer
+    
+    def get_queryset(self):
+        pk = self.kwargs["pk"]
+        return Review.objects.filter(watchlist=pk)    
+    
+    def perform_create(self, serializer):
+        pk = self.kwargs["pk"]
+        movie = WatchList.objects.get(pk=pk)
+        
+        user = self.request.user
+        review_queryset = Review.objects.filter(watchlist=movie, review_user=user)
+        
+        if review_queryset.exists():
+            raise ValidationError("You have alerady this content!!")
+        
+        serializer.save(waitchlist = movie)
+        
+
+class ReviewList(generics.ListAPIView): # get(), post()
+    # queryset =  Review.objects.all()
+    serializer_class = ReviewSerializer
+    
+    def get_queryset(self):
+        pk = self.kwargs["pk"]
+        return Review.objects.filter(watchlist=pk)
+    
+    
+class ReviewDetail(generics.RetrieveUpdateDestroyAPIView): # get(), put(), delete()
     queryset =  Review.objects.all()
-    serializer_class = StreamPlatformSerializer
+    serializer_class = ReviewSerializer
     
 
 
