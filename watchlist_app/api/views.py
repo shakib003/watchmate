@@ -4,11 +4,14 @@ from rest_framework import status
 from rest_framework import generics
 from rest_framework import mixins
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 # app import
 from watchlist_app.models import WatchList, StreamPlatform, Review
 from watchlist_app.api.serializers import (WatchListSerializer, StreamPlatformSerializer, 
                                            ReviewSerializer)
+
+from watchlist_app.api.permissions import AdminOrReadOnly, ReviewUserOrReadOnly
 
 
 class ReviewCreate(generics.ListCreateAPIView):
@@ -16,7 +19,7 @@ class ReviewCreate(generics.ListCreateAPIView):
     
     def get_queryset(self):
         pk = self.kwargs["pk"]
-        return Review.objects.filter(watchlist=pk)    
+        return Review.objects.filter(watchlist=pk)
     
     def perform_create(self, serializer):
         pk = self.kwargs["pk"]
@@ -28,12 +31,13 @@ class ReviewCreate(generics.ListCreateAPIView):
         if review_queryset.exists():
             raise ValidationError("You have alerady this content!!")
         
-        serializer.save(waitchlist = movie)
+        serializer.save(watchlist = movie, review_user=user)
         
 
 class ReviewList(generics.ListAPIView): # get(), post()
     # queryset =  Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated] # Object level permission
     
     def get_queryset(self):
         pk = self.kwargs["pk"]
@@ -43,6 +47,7 @@ class ReviewList(generics.ListAPIView): # get(), post()
 class ReviewDetail(generics.RetrieveUpdateDestroyAPIView): # get(), put(), delete()
     queryset =  Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [ReviewUserOrReadOnly] # Object level permission
     
 
 
