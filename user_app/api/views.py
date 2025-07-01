@@ -24,27 +24,26 @@ def registration_view(request):
         
         data = {}
         
-        if True:
-            if serializer.is_valid():
-                account = serializer.save()
-                
-                data["response"] = "Registration Successful!!"
-                data["username"] = account.username
-                data["email"] = account.email
-                
-                # token = Token.objects.get(user=account).key
-                # data["token"] = token
-                refresh = RefreshToken.for_user(account)
-
-                data["token"] = {
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                }
-                
-            else:
-                data = serializer.errors
-            
-            return Response(data)
         
+        if serializer.is_valid():
+            account = serializer.save()
+            
+            data["response"] = "Registration Successful!!"
+            data["username"] = account.username
+            data["email"] = account.email
+            
+            # token = Token.objects.get(user=account).key
+            # data["token"] = token
+            refresh = RefreshToken.for_user(account)
+
+            data["token"] = {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }
+            
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            data = serializer.errors
+        
+        return Response(data)
+        
+        
