@@ -38,7 +38,7 @@ class ReviewCreate(generics.ListCreateAPIView):
 class ReviewList(generics.ListAPIView): # get(), post()
     # queryset =  Review.objects.all()
     serializer_class = ReviewSerializer
-    # permission_classes = [IsAuthenticated] # Object level permission
+    permission_classes = [IsAuthenticated] # Object level permission
     
     def get_queryset(self):
         pk = self.kwargs["pk"]
